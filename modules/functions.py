@@ -68,7 +68,7 @@ def get_folder_files(
 
 
 def add_extension_metadata(
-    files, base_folder: str):
+        files, base_folder: str):
     """Construye las propiedades de cada archivo local."""
 
     result = []
@@ -102,6 +102,7 @@ def summarize_extensions(files):
         )
     return summary
 
+
 def export_to_excel(files, summary, output_file):
     """Exporta el inventario y el resumen a Excel."""
     df_files = pd.DataFrame(files)
@@ -126,7 +127,7 @@ def export_to_excel(files, summary, output_file):
         )
 
     with pd.ExcelWriter(
-        output_file, engine="openpyxl") as writer:
+            output_file, engine="openpyxl") as writer:
 
         df_files.to_excel(
             writer, sheet_name="Archivos", index=False
@@ -134,3 +135,26 @@ def export_to_excel(files, summary, output_file):
         df_summary.to_excel(
             writer, sheet_name="Resumen", index=False
         )
+
+
+def scan_folder(FOLDER_PATH: Path, INCLUDE_SUBFOLDERS: bool, OUTPUT_FILE: str):
+    files = get_folder_files(
+        folder_path=FOLDER_PATH,
+        recursive=INCLUDE_SUBFOLDERS,
+        exclude_files=[OUTPUT_FILE]
+    )
+
+    files = add_extension_metadata(
+        files=files, base_folder=FOLDER_PATH
+    )
+
+    summary = summarize_extensions(files)
+
+    export_to_excel(
+        files=files,
+        summary=summary,
+        output_file=OUTPUT_FILE
+    )
+
+    print(f"Total de archivos encontrados: {len(files)}")
+    print(f"Inventario generado: {OUTPUT_FILE}")
