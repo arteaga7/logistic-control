@@ -8,15 +8,14 @@ import pandas as pd
 def get_folder_files(
     folder_path: str, recursive: bool = False, exclude_files=None
 ) -> list[dict]:
-    """Obtiene los archivos de una carpeta local.
-    Parámetros:
-        folder_path:
-            Ruta de la carpeta que se desea analizar.
-        recursive:
-            False: analiza solamente la carpeta indicada.
-            True: analiza también todas sus subcarpetas.
-        exclude_files:
-            Lista opcional de archivos que no deben incluirse.
+    """Obtiene los archivos de una carpeta local. Parámetros:
+    folder_path:
+        Ruta de la carpeta que se desea analizar.
+    recursive:
+        False: analiza solamente la carpeta indicada.
+        True: analiza también todas sus subcarpetas.
+    exclude_files:
+        Lista opcional de archivos que no deben incluirse.
     """
     folder = Path(folder_path).resolve()
     if not folder.exists():
@@ -57,11 +56,11 @@ def get_folder_files(
     return files
 
 
-def add_extension_metadata(files: list[dict]) -> list[dict]:
+def add_extension_metadata(RELATIVE_PATH: Path, files: list[dict]) -> list[dict]:
     """Construye las propiedades de cada archivo local."""
     result = []
     # Up one level from modules/ to reach the root project folder
-    relative_folder = Path(__file__).parent.parent
+    relative_folder = Path(__file__).parent.parent / RELATIVE_PATH
 
     for file in files:
         path = file["path"]
@@ -87,9 +86,7 @@ def summarize_extensions(files: list[dict]) -> dict:
     summary = {}
     for file in files:
         extension = file["extension"] or "SIN_EXTENSION"
-        summary[extension] = (
-            summary.get(extension, 0) + 1
-        )
+        summary[extension] = (summary.get(extension, 0) + 1)
     return summary
 
 
@@ -126,13 +123,14 @@ def export_to_excel(files: list[dict], summary: dict, output_file: str):
         )
 
 
-def scan_folder(FOLDER_PATH: Path, INCLUDE_SUBFOLDERS: bool, OUTPUT_FILE: str):
+def scan_folder(FOLDER_PATH: Path, INCLUDE_SUBFOLDERS: bool, OUTPUT_FILE: str, RELATIVE_PATH: Path):
+    """Find all properties of all files in a folder"""
     files = get_folder_files(
         folder_path=FOLDER_PATH,
         recursive=INCLUDE_SUBFOLDERS,
         exclude_files=[OUTPUT_FILE]
     )
-    files = add_extension_metadata(files=files)
+    files = add_extension_metadata(RELATIVE_PATH=RELATIVE_PATH, files=files, )
     summary = summarize_extensions(files)
     export_to_excel(
         files=files,
