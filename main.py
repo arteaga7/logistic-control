@@ -20,4 +20,11 @@ FINAL_REPORT = "chi_report_processed.xlsx"
 # scan_folder(FOLDER_PATH, INCLUDE_SUBFOLDERS, OUTPUT_FILE, RELATIVE_PATH)
 # chi_report_processed(folder_path=FOLDER_PATH, archivo_salida=FINAL_REPORT)
 df = read_chi_report(folder_path=FOLDER_PATH, CHI_REPORT_NAME=CHI_REPORT_NAME)
+mailto_list = ['juan@example.com', 'ilya@example.com']
+feedback_list = ['ilya@example.com']
+df = compare_col_content(df=df, col="Responsable",
+                         new_col="Enviado", list=mailto_list)
+# print(df.head())
+df = compare_col_content(df=df, col="Responsable",
+                         new_col="Feedback", list=feedback_list)
 print(df.head())
