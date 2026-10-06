@@ -1,20 +1,19 @@
-# chi_report_processed.py:
+# chi_report_funcs.py:
 
 from pathlib import Path
 import os
 import pandas as pd
 
 
-def read_chi_report(folder_path: str | Path, CHI_REPORT_NAME: Path) -> pd.DataFrame:
+def read_chi_report(folder_path: str | Path, file: str,
+                    cols: list[str]) -> pd.DataFrame:
     """
-    Lee y transforma el archivo 'chi report.xlsx'.
-    Pasos:
+    Lee el archivo 'chi report.xlsx'. Pasos:
     1. Cambia el directorio de trabajo a folder_path.
     2. Lee la hoja 'Reporte'.
     3. Extrae las columnas "'Delivery", "Responsable" y "Justificación".
     """
     folder_path = Path(folder_path).expanduser().resolve()
-
     if not folder_path.is_dir():
         raise NotADirectoryError(
             f"La ruta no existe o no es una carpeta: {folder_path}"
@@ -22,28 +21,19 @@ def read_chi_report(folder_path: str | Path, CHI_REPORT_NAME: Path) -> pd.DataFr
 
     # Mover el directorio de trabajo a FOLDER_PATH
     os.chdir(folder_path)
-
-    if not CHI_REPORT_NAME.is_file():
-        raise FileNotFoundError(
-            f"No se encontró el archivo: {CHI_REPORT_NAME.resolve()}"
-        )
-
-    # Columns to extract
-    columnas = ["Delivery", "Responsable", "Justificación"]
-
+    # print(os.listdir())
     try:
         df = pd.read_excel(
-            CHI_REPORT_NAME,
+            file,
             sheet_name="Reporte",
-            usecols=columnas,
+            usecols=cols,
             engine="openpyxl"
         )
     except ValueError as error:
         raise ValueError(
-            "No se encontraron todas las columnas esperadas en la hoja "
-            f"'Reporte'. Columnas requeridas: {columnas}"
+            "No se encontro el archivo, la hoja o las columnas esperadas"
+            f"'Reporte'. Columnas requeridas: {cols}"
         ) from error
-
     return df
 
 
