@@ -26,15 +26,12 @@ def get_folder_files(
         raise NotADirectoryError(
             f"La ruta no corresponde a una carpeta: {folder}"
         )
-    exclude_files = exclude_files or []
+
     excluded_names = {
         Path(file).name.lower()
-        for file in exclude_files
+        for file in exclude_files or []
     }
-    if recursive:
-        paths = folder.rglob("*")
-    else:
-        paths = folder.iterdir()
+    paths = folder.rglob("*") if recursive else folder.iterdir()
 
     files = []
     for path in paths:
@@ -56,11 +53,11 @@ def get_folder_files(
     return files
 
 
-def add_extension_metadata(RELATIVE_PATH: Path, files: list[dict]) -> list[dict]:
+def add_extension_metadata(relative_path: Path, files: list[dict]) -> list[dict]:
     """Construye las propiedades de cada archivo local."""
     result = []
     # Up one level from modules/ to reach the root project folder
-    relative_folder = Path(__file__).parent.parent / RELATIVE_PATH
+    relative_folder = Path(__file__).parent.parent / relative_path
 
     for file in files:
         path = file["path"]
@@ -104,7 +101,7 @@ def export_to_excel(files: list[dict], summary: dict, output_file: str):
 
     if not df_files.empty:
         df_files = df_files.sort_values(
-            by=["extension", "name"]
+            by=["relative_path"]
         )
 
     if not df_summary.empty:
@@ -114,7 +111,6 @@ def export_to_excel(files: list[dict], summary: dict, output_file: str):
         )
 
     with pd.ExcelWriter(output_file, engine="openpyxl") as writer:
-        df_files = df_files.sort_values(by=["relative_path"])
         df_files.to_excel(
             writer, sheet_name="Archivos", index=False
         )
@@ -123,19 +119,22 @@ def export_to_excel(files: list[dict], summary: dict, output_file: str):
         )
 
 
-def scan_folder(FOLDER_PATH: Path, INCLUDE_SUBFOLDERS: bool, OUTPUT_FILE: str, RELATIVE_PATH: Path):
+def scan_folder(folder_path: Path, include_subfolders: bool, output_file: str):
     """Find all properties of all files in a folder"""
+    # Relative path is one level up
+    relative_path = folder_path.parent
+
     files = get_folder_files(
-        folder_path=FOLDER_PATH,
-        recursive=INCLUDE_SUBFOLDERS,
-        exclude_files=[OUTPUT_FILE]
+        folder_path=folder_path,
+        recursive=include_subfolders,
+        exclude_files=[output_file]
     )
-    files = add_extension_metadata(RELATIVE_PATH=RELATIVE_PATH, files=files, )
+    files = add_extension_metadata(relative_path=relative_path, files=files, )
     summary = summarize_extensions(files)
     export_to_excel(
         files=files,
         summary=summary,
-        output_file=OUTPUT_FILE
+        output_file=output_file
     )
     print(f"Total de archivos encontrados: {len(files)}")
-    print(f"Inventario generado: {OUTPUT_FILE}")
+    print(f"Inventario generado: {output_file}")
