@@ -1,18 +1,17 @@
 # logistic-control
-A comparative between PySpark, Polars and Pandas commands for data analysis is presented.
+Confidential.
 
 ## 🌎 Repository Structure
 ```
 logistic-control/
 │
+├── modules/
 ├── .gitignore
 ├── venv/                       # Virtual enviroment
 └── requirements.txt
-└── Notebooks                   # Contains all Jupyter Notebooks
-    └── nb.ipynb
+└── main.py
 ```
 ## ✨ Details
-
 
 
 ## 🚀 How to run locally
@@ -36,4 +35,4 @@ uv venv venv
 source venv/bin/activate
 uv pip install -r requirements.txt
 ```
-3. Run "Notebooks/nb.ipynb".
+3. Run "main.py".
