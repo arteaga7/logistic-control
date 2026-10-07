@@ -219,3 +219,7 @@ __marimo__/
 
 venv/
 Unilever/
+
+*.xlsx
+*.xlsm
+*.msg
