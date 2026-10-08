@@ -2,7 +2,7 @@
 
 from pathlib import Path
 import extract_msg
-from modules.chi_report_funcs import get_filename
+from modules.chi_report_funcs import get_filenames
 import re
 import html
 
@@ -15,26 +15,31 @@ def extract_emails(texto: str) -> list[str]:
     return [m.strip() for m in patron.findall(texto)]
 
 
-def read_msg(folder_path: Path) -> dict:
-    """Extrae cuerpo y metadatos de un archivo .msg"""
-    msg_name = get_filename(folder_path, extension="*.msg")
+def read_msg(folder_path: Path, n_mails: int | None = None,
+             extension: str = "*.msg", property: str = "to") -> list[str]:
+    """
+    Extrae todas las direcciones de correo de la propiedad indicada
+    ("to", "cc" o "sender") de los archivos .msg.
+    """
+    msg_names = get_filenames(folder_path, extension)
+    if n_mails is not None:
+        msg_names = msg_names[:n_mails]
 
-    if not msg_name:
-        raise FileNotFoundError(
-            f"No se encontró ningún archivo .msg en {folder_path}"
-        )
+    addresses = []
+    for msg_name in msg_names:
+        file_path = folder_path / msg_name
+        message = None
+        try:
+            message = extract_msg.Message(file_path)
+            value = getattr(message, property, None)
+            if value:
+                addresses.extend(extract_emails(value))
 
-    msg_path = folder_path / msg_name
-    msg = extract_msg.Message(msg_path)
-    datos = {
-        "file": Path(msg_path).name,
-        "subject": msg.subject,
-        "sender": msg.sender,
-        "to": extract_emails(msg.to),
-        "cc": extract_emails(msg.cc),
-        # "bcc": split_emails(msg.bcc),
-        "date": str(msg.date) if msg.date else None,
-        # "message_id": getattr(msg, "messageId", None),
-        "body": msg.body,
-    }
-    return datos
+        except Exception:
+            pass
+
+        finally:
+            if message is not None:
+                message.close()
+
+    return addresses

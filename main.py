@@ -2,7 +2,7 @@
 
 from pathlib import Path
 from modules.scan_folder_funcs import scan_folder
-from modules.chi_report_funcs import read_xlsm
+from modules.chi_report_funcs import read_xlsm, compare_col_content, save_excel
 from modules.mail_funcs import read_msg
 
 
@@ -19,34 +19,34 @@ FOLDER_PATH = (
 INCLUDE_SUBFOLDERS = True  # Analyze subfolders
 OUTPUT_FILE = "folder_content.xlsx"
 # Constants related to CHI Report ----------------------
-MONTH = "04 April"
+MONTH = "03 March"
 CHI_REPORT_FOLDER = Path(FOLDER_PATH) / MONTH / "1. CHI Report + Request"
-# CHI_REPORT_NAME = "chi report.xlsx"
+JUSTIFICATION_FOLDER = Path(FOLDER_PATH) / MONTH / "2. Justifications"
+APPOVAL_FOLDER = Path(FOLDER_PATH) / MONTH / "3. Approvals"
 # Columns to extract of the CHI Report
 COLS_CHI_REPORT = ["Responsable", "Approver", "Justificación"]
 FINAL_REPORT = "chi_report_processed.xlsx"
 
 
-scan_folder(FOLDER_PATH, INCLUDE_SUBFOLDERS, OUTPUT_FILE)
+# scan_folder(FOLDER_PATH, INCLUDE_SUBFOLDERS, OUTPUT_FILE)
 df = read_xlsm(CHI_REPORT_FOLDER, COLS_CHI_REPORT)
-print(df.head())
-email_dict = read_msg(CHI_REPORT_FOLDER)
-print(f"From: {email_dict["sender"]}")
-print(f"Cc: {email_dict["cc"]}")
-
-"""
-mailto_chi_report = ['Antonio.Arteaga@unilever.com', 'juan@example.com']
-from_justifications = ['ilya@example.com', 'juan@example.com']
-print(f"From: {email_dict["sender"]}")
-print(f"Cc: {email_dict["cc"]}")
-
-
-df = compare_col_content(df=df, col="Responsable",
-                         new_col="Enviado", list=mailto_list)
 # print(df.head())
+mailto_chi_report = read_msg(folder_path=CHI_REPORT_FOLDER, n_mails=1,
+                             extension="*.msg", property="to")
+# print(f"\nmailto: {mailto_chi_report}")
+
+from_justifications = read_msg(folder_path=JUSTIFICATION_FOLDER,
+                               extension="*.msg", property="sender")
+# print(f"\nfrom: {from_justifications}")
+
+
 df = compare_col_content(df=df, col="Responsable",
-                         new_col="Feedback", list=feedback_list)
-print(df.head())
+                         new_col="Enviado", mails=mailto_chi_report)
+df = compare_col_content(df=df, col="Responsable",
+                         new_col="Feedback", mails=from_justifications)
+
+save_excel(df, FINAL_REPORT)
+"""
 
 if __name__ == "__main__":
     main()

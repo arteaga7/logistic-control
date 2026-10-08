@@ -4,14 +4,10 @@ from pathlib import Path
 import pandas as pd
 
 
-def get_filename(folder_path: Path, extension: str) -> str | None:
-    """
-    Regresa el nombre del primer archivo .xlsm encontrado
-    o None si no existe ninguno.
-    """
-    for file in folder_path.glob(extension):
-        return file.name
-    return None
+def get_filenames(folder_path: Path, extension: str) -> list[str]:
+    """Regresa los nombres de todos los archivos que coincidan
+    con la extensión."""
+    return [file.name for file in folder_path.glob(extension) if file.is_file()]
 
 
 def read_chi_report(file_path: str | Path, cols: list[str]) -> pd.DataFrame:
@@ -37,7 +33,8 @@ def read_chi_report(file_path: str | Path, cols: list[str]) -> pd.DataFrame:
 
 
 def read_xlsm(folder_path: Path, cols: list[str]) -> pd.DataFrame:
-    xlsm_name = get_filename(folder_path, extension="*.xlsm")
+    """Read the firts xlsm file, it should be only one."""
+    xlsm_name = get_filenames(folder_path, extension="*.xlsm")[0]
     if not xlsm_name:
         raise FileNotFoundError(
             f"No se encontró ningún archivo .xlsm en {folder_path}"
@@ -48,11 +45,17 @@ def read_xlsm(folder_path: Path, cols: list[str]) -> pd.DataFrame:
     )
 
 
-def compare_col_content(df: pd.DataFrame, col: str, new_col: str, addresses: list[str]) -> pd.DataFrame:
-    """
-    Compare column "col" with "list", if the content of column is in list,
-    assign “si” in "new_col", otherwise assign “no”
-    """
+def compare_col_content(df: pd.DataFrame, col: str, new_col: str,
+                        mails: list[str]) -> pd.DataFrame:
+    """Compare content in column "col" with "mails and create a new column"""
     df = df.copy()
-    df[new_col] = df[col].isin(addresses)
+    df[new_col] = df[col].isin(mails)
     return df
+
+
+def save_excel(df: pd.DataFrame, output_file: str, hoja: str = "Hoja1"):
+    """Save dataframe in an Excel file"""
+    with pd.ExcelWriter(output_file, engine="openpyxl", mode="w") as writer:
+        df.to_excel(writer, sheet_name=hoja, index=False)
+    print(f"Dataframe guardado: {output_file}")
+    return
