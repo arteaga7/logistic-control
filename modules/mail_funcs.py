@@ -1,5 +1,4 @@
-# read_mail.py
-
+# mail_funcs.py
 from pathlib import Path
 import extract_msg
 from modules.chi_report_funcs import get_filenames
@@ -34,12 +33,9 @@ def read_msg(folder_path: Path, n_mails: int | None = None,
             value = getattr(message, property, None)
             if value:
                 addresses.extend(extract_emails(value))
-
         except Exception:
             pass
-
         finally:
             if message is not None:
                 message.close()
-
     return addresses
