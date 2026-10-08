@@ -25,29 +25,33 @@ JUSTIFICATION_FOLDER = Path(FOLDER_PATH) / MONTH / "2. Justifications"
 APPOVAL_FOLDER = Path(FOLDER_PATH) / MONTH / "3. Approvals"
 # Columns to extract of the CHI Report
 COLS_CHI_REPORT = ["Responsable", "Approver", "Justificación"]
-FINAL_REPORT = "chi_report_processed.xlsx"
+FINAL_REPORT = "Report_" + MONTH + ".xlsx"
 
-
-# scan_folder(FOLDER_PATH, INCLUDE_SUBFOLDERS, OUTPUT_FILE)
-df = read_xlsm(CHI_REPORT_FOLDER, COLS_CHI_REPORT)
-# print(df.head())
-mailto_chi_report = read_msg(folder_path=CHI_REPORT_FOLDER, n_mails=1,
-                             extension="*.msg", property="to")
-# print(f"\nmailto: {mailto_chi_report}")
-
-from_justifications = read_msg(folder_path=JUSTIFICATION_FOLDER,
-                               extension="*.msg", property="sender")
-# print(f"\nfrom: {from_justifications}")
-
-
-df = compare_col_content(df=df, col="Responsable",
-                         new_col="Enviado", mails=mailto_chi_report)
-df = compare_col_content(df=df, col="Responsable",
-                         new_col="Feedback", mails=from_justifications)
-
-save_excel(df, FINAL_REPORT)
-"""
 
 if __name__ == "__main__":
-    main()
-"""
+    scan_folder(FOLDER_PATH, INCLUDE_SUBFOLDERS, OUTPUT_FILE)
+
+    df = read_xlsm(CHI_REPORT_FOLDER, COLS_CHI_REPORT)
+    mailto_chi_report = read_msg(folder_path=CHI_REPORT_FOLDER, n_mails=1,
+                                 extension="*.msg", property="to")
+    # print(f"\nmailto_chi_report: {mailto_chi_report}")
+
+    from_justifications = read_msg(folder_path=JUSTIFICATION_FOLDER,
+                                   extension="*.msg", property="sender")
+
+    from_approver = read_msg(folder_path=APPOVAL_FOLDER,
+                             extension="*.msg", property="sender")
+
+    # Step 1
+    df = compare_col_content(df=df, col="Responsable",
+                             new_col="Enviado", mails=mailto_chi_report)
+    # Step 2
+    df = compare_col_content(df=df, col="Responsable",
+                             new_col="Feedback", mails=from_justifications)
+    # Step 3
+    df = compare_col_content(df=df, col="Approver",
+                             new_col="Aprobacion", mails=from_approver)
+
+    df_final = df[["Responsable", "Enviado", "Feedback",
+                   "Approver", "Aprobacion", "Justificación"]]
+    save_excel(df_final, FINAL_REPORT)
