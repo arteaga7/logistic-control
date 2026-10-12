@@ -1,5 +1,6 @@
 # main.py:
 from pathlib import Path
+import argparse
 from modules.scan_folder_funcs import scan_folder
 from modules.chi_report_funcs import read_xlsm, compare_col_content, save_excel
 from modules.mail_funcs import read_msg
@@ -13,7 +14,11 @@ FOLDER_PATH = (
 )
 INCLUDE_SUBFOLDERS = True  # Analyze subfolders
 OUTPUT_FILE = "folder_content.xlsx"
-MONTH = "03 March"
+parser = argparse.ArgumentParser()
+parser.add_argument("--month", default="03 March")
+args = parser.parse_args()
+
+MONTH = args.month
 COLS_CHI_REPORT = ["Responsable", "Approver", "Justificación"]
 CHI_REPORT_FOLDER = Path(FOLDER_PATH) / MONTH / "1. CHI Report + Request"
 JUSTIFICATION_FOLDER = Path(FOLDER_PATH) / MONTH / "2. Justifications"
