@@ -30,7 +30,7 @@ FINAL_REPORT_FOLDER = Path(FOLDER_PATH) / MONTH / FINAL_REPORT
 OUTPUT_FILE = "folder_content" + f"_{date}" + ".xlsx"
 
 if __name__ == "__main__":
-    scan_folder(FOLDER_PATH, INCLUDE_SUBFOLDERS, OUTPUT_FILE)
+    # scan_folder(FOLDER_PATH, INCLUDE_SUBFOLDERS, OUTPUT_FILE)
     df = read_xlsm(CHI_REPORT_FOLDER, COLS_CHI_REPORT)
     mailto_chi_report = read_msg(folder_path=CHI_REPORT_FOLDER, n_mails=1,
                                  extension="*.msg", property="to")
