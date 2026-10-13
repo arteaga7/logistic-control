@@ -12,5 +12,7 @@ REM 3) Instalar o actualizar dependencias (rápido si ya están)
 uv pip install --link-mode=copy -r requirements.txt
 
 REM 4) Ejecutar sin activar el venv
-.venv\Scripts\python.exe main.py --month "03 March"
+set "MES=%~1"
+if "%MES%"=="" set /p "MES=Mes (ej. 03 March): "
+.venv\Scripts\python.exe main.py --month "%MES%"
 pause
