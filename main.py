@@ -7,25 +7,27 @@ from modules.mail_funcs import read_msg
 from datetime import datetime
 
 PROJECT_DIR = Path(__file__).resolve().parent
+INCLUDE_SUBFOLDERS = True  # Analyze subfolders
+parser = argparse.ArgumentParser()
+parser.add_argument("--month", default="03 March")
+parser.add_argument("--unilever_path", type=Path, default=PROJECT_DIR)
+args = parser.parse_args()
+MONTH = args.month
+UNILEVER_PATH = args.unilever_path
+
 FOLDER_PATH = (
-    PROJECT_DIR / "Unilever"
+    UNILEVER_PATH / "Unilever"
     / "Productivity Plan - Prueba Bot Controles delivery"
     / "Mexico" / "Deliver" / "OTB C5.2" / "2026"
 )
-INCLUDE_SUBFOLDERS = True  # Analyze subfolders
-OUTPUT_FILE = "folder_content.xlsx"
-parser = argparse.ArgumentParser()
-parser.add_argument("--month", default="03 March")
-args = parser.parse_args()
-
-MONTH = args.month
 COLS_CHI_REPORT = ["Responsable", "Approver", "Justificación"]
 CHI_REPORT_FOLDER = Path(FOLDER_PATH) / MONTH / "1. CHI Report + Request"
 JUSTIFICATION_FOLDER = Path(FOLDER_PATH) / MONTH / "2. Justifications"
 APPOVAL_FOLDER = Path(FOLDER_PATH) / MONTH / "3. Approvals"
 date = datetime.now().strftime('%Y%m%d_%H%M%S')
-FINAL_REPORT = "Report_" + MONTH + f"_{date}" + ".xlsx"
+FINAL_REPORT = "Report_local_" + MONTH + f"_{date}" + ".xlsx"
 FINAL_REPORT_FOLDER = Path(FOLDER_PATH) / MONTH / FINAL_REPORT
+OUTPUT_FILE = "folder_content" + f"_{date}" + ".xlsx"
 
 if __name__ == "__main__":
     scan_folder(FOLDER_PATH, INCLUDE_SUBFOLDERS, OUTPUT_FILE)
