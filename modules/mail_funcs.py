@@ -4,6 +4,7 @@ import extract_msg
 from modules.chi_report_funcs import get_filenames
 import re
 import html
+import requests
 
 
 def extract_emails(texto: str) -> list[str]:
@@ -39,3 +40,10 @@ def read_msg(folder_path: Path, n_mails: int | None = None,
             if message is not None:
                 message.close()
     return addresses
+
+
+def send_mail(URL: str, json_file: dict, headers: dict) -> None:
+    """Send an email"""
+    response = requests.post(URL, data=json_file,  headers=headers)
+    print(response.status_code)
+    print(response.text)
