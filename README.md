@@ -18,6 +18,7 @@ logistic-control/
 1. Clone this repository:
 ```
 git clone https://github.com/arteaga7/logistic-control.git
+cd logistic-control
 ```
 2. Set virtual environment and install dependencies.
 
@@ -35,4 +36,6 @@ uv venv venv
 source venv/bin/activate
 uv pip install -r requirements.txt
 ```
-3. Run "main.py".
+3. Run "run.bat", add the corresponding month and full path of the SharePoint folder.
+
+![alt text](image.png)
