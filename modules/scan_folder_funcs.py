@@ -4,6 +4,15 @@ from datetime import datetime
 import pandas as pd
 
 
+def create_folder_structure(base_path, folders, subfolders):
+    """Crea cada folder y, dentro de cada uno, los subfolders indicados."""
+    base_path = Path(base_path)
+    for folder in folders:
+        for subfolder in subfolders:
+            path = base_path / folder / subfolder
+            path.mkdir(parents=True, exist_ok=True)
+
+
 def get_folder_files(
     folder_path: str, recursive: bool = False, exclude_files=None
 ) -> list[dict]:

@@ -1,13 +1,17 @@
 # main.py:
 from pathlib import Path
 import argparse
-from modules.scan_folder_funcs import scan_folder
+from modules.scan_folder_funcs import scan_folder, create_folder_structure
 from modules.chi_report_funcs import read_xlsm, compare_col_content, save_excel
 from modules.mail_funcs import read_msg
 from datetime import datetime
 
 PROJECT_DIR = Path(__file__).resolve().parent
 INCLUDE_SUBFOLDERS = True  # Analyze subfolders
+folders = ["01 January", "02 February", "03 March", "04 April", "05 May", "06 June",
+           "07 July", "08 Augost", "09 September", "10 October", "11 November",
+           "12 Dicember"]
+subfolders = ["1. CHI Report + Request", "2. Justifications", "3. Approvals"]
 parser = argparse.ArgumentParser()
 parser.add_argument("--month", default="03 March")
 parser.add_argument("--unilever_path", type=Path, default=PROJECT_DIR)
@@ -30,6 +34,7 @@ FINAL_REPORT_FOLDER = Path(FOLDER_PATH) / MONTH / FINAL_REPORT
 OUTPUT_FILE = "folder_content" + f"_{date}" + ".xlsx"
 
 if __name__ == "__main__":
+    create_folder_structure(FOLDER_PATH, folders, subfolders)
     # scan_folder(FOLDER_PATH, INCLUDE_SUBFOLDERS, OUTPUT_FILE)
     df = read_xlsm(CHI_REPORT_FOLDER, COLS_CHI_REPORT)
     mailto_chi_report = read_msg(folder_path=CHI_REPORT_FOLDER, n_mails=1,
@@ -50,5 +55,5 @@ if __name__ == "__main__":
 
     df_final = df[["Responsable", "Enviado", "Feedback",
                    "Approver", "Aprobacion", "Justificación"]]
-    save_excel(df_final, FINAL_REPORT)
+
     save_excel(df_final, FINAL_REPORT_FOLDER)
